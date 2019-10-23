@@ -37,7 +37,6 @@ end
 class Player
     attr_reader :score
 
-
     def initialize
         @image = Gosu::Image.new("media/starfighter.bmp")
         @beep = Gosu::Sample.new("media/beep.wav")
@@ -50,16 +49,16 @@ class Player
     end
 
     def turn_left
-        @angle -= 4.5
+        @angle -= 6.0
     end
 
     def turn_right
-        @angle += 4.5
+        @angle += 6.0
     end
 
     def accelerate
-        @vel_x += Gosu.offset_x(@angle, 0.5)
-        @vel_y += Gosu.offset_y(@angle, 0.5)
+        @vel_x += Gosu.offset_x(@angle, 0.6)
+        @vel_y += Gosu.offset_y(@angle, 0.6)
     end
 
     def move
@@ -68,8 +67,8 @@ class Player
         @x %= 720
         @y %= 560
 
-        @vel_x *= 0.95
-        @vel_y *= 0.95
+        @vel_x *= 0.97
+        @vel_y *= 0.97
     end
 
     def draw
