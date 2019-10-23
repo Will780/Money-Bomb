@@ -1,5 +1,19 @@
 require 'gosu'
 
+class Blackhole
+    attr_reader :x, :y
+
+    def initialize(animation)
+        @image = Gosu::Image.new("media/blackhole.png")
+        @x = rand * 720
+        @y = rand * 560
+    end
+
+    def draw
+        @image.draw(@x, @y, 1)
+    end
+end
+
 class Star
     attr_reader :x, :y
 
@@ -9,8 +23,8 @@ class Star
         @color.red = rand(256 - 40) + 40
         @color.green = rand(256 - 40) + 40
         @color.blue = rand(256 - 40) + 40
-        @x = rand * 640
-        @y = rand * 480
+        @x = rand * 720
+        @y = rand * 560
     end
 
     def draw
@@ -51,8 +65,8 @@ class Player
     def move
         @x += @vel_x
         @y += @vel_y
-        @x %= 640
-        @y %= 480
+        @x %= 720
+        @y %= 560
 
         @vel_x *= 0.95
         @vel_y *= 0.95
@@ -77,24 +91,34 @@ class Player
             end
         end
     end
+
+    def avoid_blackholes(blackholes)
+        blackholes.reject! do |blackhole| 
+            if Gosu.distance(@x, @y, blackhole.x, blackhole.y) < 20
+                @score = 0
+            end
+        end
+    end
 end
 
 module ZOrder
-    BACKGROUND, STARS, PLAYER, UI = *0..3
+    BACKGROUND, STARS, BLACKHOLES, PLAYER, UI = *0..4
 end
 
 class Tutorial < Gosu::Window
     def initialize
-        super 640, 480
+        super 720, 560
         self.caption = "Tutorial Game"
 
         @background_image = Gosu::Image.new("media/space.png", :tileable => true)
 
         @player = Player.new
-        @player.warp(320, 240)
+        @player.warp(360, 280)
 
         @star_anim = Gosu::Image.load_tiles("media/star.png", 25, 25)
         @stars = Array.new
+
+        @blackholes = Array.new
 
         @font = Gosu::Font.new(20)
     end
@@ -111,9 +135,18 @@ class Tutorial < Gosu::Window
         end
         @player.move
         @player.collect_stars(@stars)
+        @player.avoid_blackholes(@blackholes)
 
         if rand(100) < 4 and @stars.size < 25
             @stars.push(Star.new(@star_anim))
+        end
+
+        if rand(100) < 4 and @blackholes.size < 10
+            @blackholes.push(Blackhole.new(@blackhole_anim))
+        end
+
+        if @blackholes.size == 10
+            @blackholes.slice!(0)
         end
     end
 
@@ -121,6 +154,7 @@ class Tutorial < Gosu::Window
         @background_image.draw(0, 0, ZOrder::BACKGROUND)
         @player.draw
         @stars.each { |star| star.draw }
+        @blackholes.each { |blackhole| blackhole.draw }
         @font.draw("Score: #{@player.score}", 10, 10, ZOrder::UI, 1.0, 1.0, Gosu::Color::YELLOW)
     end
 
