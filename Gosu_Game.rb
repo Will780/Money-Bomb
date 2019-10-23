@@ -120,7 +120,7 @@ class Tutorial < Gosu::Window
 
         @blackholes = Array.new
 
-        @font = Gosu::Font.new(20)
+        @font = Gosu::Font.new(25)
     end
 
     def update
