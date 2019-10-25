@@ -93,7 +93,7 @@ class Player
 
     def avoid_blackholes(blackholes)
         blackholes.reject! do |blackhole| 
-            if Gosu.distance(@x, @y, blackhole.x, blackhole.y) < 20
+            if Gosu.distance(@x, @y, blackhole.x, blackhole.y) < 28
                 @score = 0
             end
         end
@@ -131,6 +131,9 @@ class Tutorial < Gosu::Window
         end
         if Gosu.button_down? Gosu::KB_UP or Gosu::button_down? Gosu::GP_BUTTON_0
             @player.accelerate
+        end
+        if Gosu.button_down? Gosu::KB_SPACE
+            @player.warp(rand * 720, rand * 560)
         end
         @player.move
         @player.collect_stars(@stars)
