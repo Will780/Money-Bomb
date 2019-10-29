@@ -11,12 +11,11 @@ class Tutorial < Gosu::Window
         super 640, 480
         self.caption = "Money Bomb"
 
-        @background_image = Gosu::Image.new("media/something.something", :tileable => true)
+        @background_image = Gosu::Image.new("media/city.jpg", :tileable => true)
 
         @player = Player.new
-        @player.warp(320, 30)
+        @player.warp(320, 435)
 
-        @coin_anim = Gosu::Image.load_tiles("media/something.something", 25, 25)
         @coins = Array.new
 
         @bombs = Array.new
@@ -31,7 +30,10 @@ class Tutorial < Gosu::Window
         if Gosu.button_down? Gosu::KB_RIGHT or Gosu::button_down? Gosu::GP_RIGHT
             @player.move_right
         end
+        # @coin.move
+        # @bomb.move  why no method?
         @player.collect_coins(@coins)
+        @player.avoid_bombs(@bombs)
 
         if rand(100) < 3
             @coins.push(Coin.new(@star_anim))
@@ -46,7 +48,7 @@ class Tutorial < Gosu::Window
         @player.draw
         @coins.each { |coin| coin.draw }
         @bombs.each { |bomb| bomb.draw }
-        @font.draw("Money: $#{@player.score}", 10, 10, Zorder::UI, 1.0, 1.0, Gosu::Color::YELLOW)
+        @font.draw("Money: $#{@player.score}", 10, 10, ZOrder::UI, 1.0, 1.0, Gosu::Color::YELLOW)
     end
 end
 
@@ -54,7 +56,7 @@ class Player
     attr_reader :score
 
     def initialize
-        @image = Gosu::Image.new("media/something.something")
+        @image = Gosu::Image.new("media/character.png")
         @score = 0
     end
 
@@ -73,7 +75,7 @@ class Player
     end
 
     def draw
-        @image.draw_rot(@x)
+        @image.draw(@x, @y, 1)
     end
 
     def score
@@ -82,8 +84,16 @@ class Player
 
     def collect_coins(coins)
         coins.reject! do |coin|
-            if Gosu.distance(@x, @y, coin.x, star.y) < 20
-                @score += #variable
+            if Gosu.distance(@x, @y, coin.x, coin.y) < 20
+                @score += 2
+            end
+        end
+    end
+
+    def avoid_bombs(bombs)
+        bombs.reject! do |bomb|
+            if Gosu.distance(@x, @y, bomb.x, bomb.y) < 20
+                close
             end
         end
     end
@@ -93,13 +103,20 @@ class Coin
     attr_reader :x, :y
 
     def initialize(animation)
-        @image = Gosu::Image.new("media/something.something")
+        @image = Gosu::Image.new("media/coin.jpg")
         @x= rand * 640
-        @y = 450
+        @y = 35
     end
 
     def draw
         @image.draw(@x, @y, 1)
+    end
+
+    def move
+        @y += 4
+        if @y > 468
+            @coins.slice!(0)
+        end
     end
 end
 
@@ -107,18 +124,25 @@ class Bomb
     attr_reader :x, :y
 
     def initialize(animation)
-        @image = Gosu::Image.new("media/something.something")
+        @image = Gosu::Image.new("media/bomb.png")
         @x= rand * 640
-        @y = 450
+        @y = 35
     end
 
     def draw
         @image.draw(@x, @y, 1)
     end
+
+    def move
+        @y += 4
+        if @y > 468
+            @bombs.slice!(0)
+        end
+    end
 end
 
 module ZOrder
-    BACKGROUND, COINS, PLAYER, UI = *0..3
+    BACKGROUND, COINS, BOMBS, PLAYER, UI = *0..4
 end
 
 Tutorial.new.show
