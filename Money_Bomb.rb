@@ -14,7 +14,7 @@ class Tutorial < Gosu::Window
         @background_image = Gosu::Image.new("media/city.jpg", :tileable => true)
 
         @player = Player.new
-        @player.warp(320, 435)
+        @player.warp(320, 433)
 
         @coins = Array.new
 
@@ -30,16 +30,18 @@ class Tutorial < Gosu::Window
         if Gosu.button_down? Gosu::KB_RIGHT or Gosu::button_down? Gosu::GP_RIGHT
             @player.move_right
         end
-        # @coin.move
-        # @bomb.move  why no method?
+
+        # @coin.fall
+        # @bomb.fall
+        
         @player.collect_coins(@coins)
         @player.avoid_bombs(@bombs)
 
-        if rand(100) < 3
-            @coins.push(Coin.new(@star_anim))
+        if rand(100) < 2
+            @coins.push(Coin.new)
         end
-        if rand(100) < 3
-            @bombs.push(Bomb.new(@Bomb_anim))
+        if rand(100) < 1
+            @bombs.push(Bomb.new)
         end
     end
 
@@ -102,7 +104,7 @@ end
 class Coin
     attr_reader :x, :y
 
-    def initialize(animation)
+    def initialize
         @image = Gosu::Image.new("media/coin.jpg")
         @x= rand * 640
         @y = 35
@@ -110,20 +112,14 @@ class Coin
 
     def draw
         @image.draw(@x, @y, 1)
-    end
-
-    def move
-        @y += 4
-        if @y > 468
-            @coins.slice!(0)
-        end
+        @y += 2
     end
 end
 
 class Bomb
     attr_reader :x, :y
 
-    def initialize(animation)
+    def initialize
         @image = Gosu::Image.new("media/bomb.png")
         @x= rand * 640
         @y = 35
@@ -131,14 +127,9 @@ class Bomb
 
     def draw
         @image.draw(@x, @y, 1)
+        @y += 2
     end
 
-    def move
-        @y += 4
-        if @y > 468
-            @bombs.slice!(0)
-        end
-    end
 end
 
 module ZOrder
