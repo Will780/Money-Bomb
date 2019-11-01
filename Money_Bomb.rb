@@ -1,9 +1,15 @@
 require 'gosu'
 
-# class Start
-#     super 640, 480
-#     self.caption = "Money Bomb"
-#     @background_image = Gosu::Image.new("media/someting.something")
+# class Start < Gosu::Window
+#     def initialize
+#         super 640, 480
+#         self.caption = "Start"
+#         @background_image = Gosu::Image.new("media/city.jpg")
+
+#         if Gosu.button_down? Gosu::KB_SPACE
+#             Tutorial.new.show
+#         end
+#     end
 # end
 
 class Tutorial < Gosu::Window
@@ -14,7 +20,7 @@ class Tutorial < Gosu::Window
         @background_image = Gosu::Image.new("media/city.jpg", :tileable => true)
 
         @player = Player.new
-        @player.warp(320, 433)
+        @player.warp(320, 432)
 
         @coins = Array.new
 
@@ -31,17 +37,22 @@ class Tutorial < Gosu::Window
             @player.move_right
         end
 
-        # @coin.fall
-        # @bomb.fall
-        
         @player.collect_coins(@coins)
         @player.avoid_bombs(@bombs)
 
-        if rand(100) < 2
+        if rand(150) < 2
             @coins.push(Coin.new)
         end
-        if rand(100) < 1
+        if rand(150) < 1
             @bombs.push(Bomb.new)
+        end
+    end
+
+    def button_down(id)
+        if id == Gosu::KB_ESCAPE
+            close
+        else
+            super
         end
     end
 
@@ -86,8 +97,8 @@ class Player
 
     def collect_coins(coins)
         coins.reject! do |coin|
-            if Gosu.distance(@x, @y, coin.x, coin.y) < 20
-                @score += 2
+            if Gosu.distance(@x, @y, coin.x, coin.y) < 20 
+                @score += coin.value
             end
         end
     end
@@ -95,24 +106,29 @@ class Player
     def avoid_bombs(bombs)
         bombs.reject! do |bomb|
             if Gosu.distance(@x, @y, bomb.x, bomb.y) < 20
-                close
+                Tutorial.new.show #change?
             end
         end
     end
 end
 
 class Coin
-    attr_reader :x, :y
+    attr_reader :x, :y, :value
 
     def initialize
         @image = Gosu::Image.new("media/coin.jpg")
         @x= rand * 640
         @y = 35
+        if rand(40) < 3
+            @value = 10
+        else
+            @value = 5
+        end
     end
 
     def draw
         @image.draw(@x, @y, 1)
-        @y += 2
+        @y += (@value / 2)
     end
 end
 
@@ -127,9 +143,8 @@ class Bomb
 
     def draw
         @image.draw(@x, @y, 1)
-        @y += 2
+        @y += 3
     end
-
 end
 
 module ZOrder
