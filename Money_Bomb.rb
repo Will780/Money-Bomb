@@ -1,16 +1,29 @@
 require 'gosu'
 
-# class Start < Gosu::Window
-#     def initialize
-#         super 640, 480
-#         self.caption = "Start"
-#         @background_image = Gosu::Image.new("media/city.jpg")
+class Start < Gosu::Window
+    def initialize
+        super 640, 480
+        self.caption = "Start"
+        @background_image = Gosu::Image.new("media/city.jpg", :tileable => true)
+        @font = Gosu::Font.new(24)
+    end
 
-#         if Gosu.button_down? Gosu::KB_SPACE
-#             Tutorial.new.show
-#         end
-#     end
-# end
+    def update
+        if Gosu.button_down? Gosu::KB_SPACE
+            Tutorial.new.show
+        end
+        if Gosu.button_down? Gosu::KB_TAB
+            close
+        else
+            super
+        end
+    end
+
+    def draw
+        @background_image.draw(0, 0, 0)
+        @font.draw("Press Space to start \nPress Tab to quit \nPress Esc to go back to start", 10, 10, ZOrder::UI, 2.0, 2.0, Gosu::Color::BLACK)
+    end
+end
 
 class Tutorial < Gosu::Window
     def initialize
@@ -50,9 +63,7 @@ class Tutorial < Gosu::Window
 
     def button_down(id)
         if id == Gosu::KB_ESCAPE
-            close
-        else
-            super
+            Start.new.show
         end
     end
 
@@ -78,12 +89,12 @@ class Player
     end
 
     def move_right
-        @x += 5
+        @x += 4
         @x %= 640
     end
 
     def move_left
-        @x += -5
+        @x += -4
         @x %= 640
     end
 
@@ -106,7 +117,7 @@ class Player
     def avoid_bombs(bombs)
         bombs.reject! do |bomb|
             if Gosu.distance(@x, @y, bomb.x, bomb.y) < 20
-                Tutorial.new.show #change?
+                Start.new.show
             end
         end
     end
@@ -151,4 +162,4 @@ module ZOrder
     BACKGROUND, COINS, BOMBS, PLAYER, UI = *0..4
 end
 
-Tutorial.new.show
+Start.new.show

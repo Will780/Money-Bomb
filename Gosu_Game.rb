@@ -132,9 +132,6 @@ class Tutorial < Gosu::Window
         if Gosu.button_down? Gosu::KB_UP or Gosu::button_down? Gosu::GP_BUTTON_0
             @player.accelerate
         end
-        if Gosu.button_down? Gosu::KB_SPACE
-            @player.warp(rand * 720, rand * 560)
-        end
         @player.move
         @player.collect_stars(@stars)
         @player.avoid_blackholes(@blackholes)
